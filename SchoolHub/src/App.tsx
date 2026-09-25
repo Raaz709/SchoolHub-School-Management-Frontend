@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, User, Building, Lock } from 'lucide-react';
+import { Eye, EyeOff, User, Building, Lock, Bell, Search, Calendar as CalendarIcon, CheckSquare, BookOpen, ChevronRight } from 'lucide-react';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'login' | 'dashboard' | 'attendance'>('login');
@@ -51,7 +51,7 @@ export default function App() {
       <div className="w-[390px] h-[844px] bg-[#f0f4f9] rounded-[48px] shadow-2xl border-[10px] border-[#1e2229] overflow-hidden flex flex-col relative">
         
         {/* iOS Status Bar */}
-        <div className="h-11 bg-transparent px-6 flex items-center justify-between text-xs font-semibold text-gray-800 pt-2 shrink-0">
+        <div className="h-11 bg-transparent px-6 flex items-center justify-between text-xs font-semibold text-gray-800 pt-2 shrink-0 z-10">
           <span>9:12</span>
           <div className="w-28 h-4 bg-black rounded-full mx-auto absolute left-1/2 transform -translate-x-1/2 top-2"></div>
           <div className="flex items-center space-x-1.5 text-gray-800">
@@ -181,6 +181,159 @@ export default function App() {
           </div>
         )}
 
+        {/* Feature 2: Dashboard Screen */}
+        {currentScreen === 'dashboard' && (
+          <div className="flex-1 overflow-y-auto px-5 py-3 space-y-4">
+            {/* Top User Profile Header */}
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center text-white font-bold justify-center shadow-md">
+                  ER
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-gray-900">Emma Roberts</h2>
+                  <p className="text-[11px] text-gray-500 font-medium">Grade 7 B</p>
+                </div>
+              </div>
+              <div className="w-9 h-9 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-700 relative cursor-pointer">
+                <Bell className="w-4 h-4" />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                <Search className="w-4 h-4" />
+              </span>
+              <input
+                type="text"
+                placeholder="Search here..."
+                className="w-full pl-10 pr-4 py-2.5 bg-white/80 backdrop-blur-md border border-gray-200/80 rounded-2xl text-xs text-gray-800 placeholder-gray-400 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Announcement Banner */}
+            <div className="bg-[#1f2937] text-white text-[11px] px-3.5 py-2.5 rounded-xl flex items-center space-x-2 shadow-sm">
+              <span className="text-sm">📢</span>
+              <span className="font-medium">Announcement: PTM on Mar 12, bus routes updated!</span>
+            </div>
+
+            {/* School Menu Section */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-bold text-gray-800">School Menu</h3>
+                <span className="text-[11px] text-blue-600 font-semibold cursor-pointer hover:underline">See all</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="bg-white p-3.5 rounded-2xl shadow-xs border border-gray-100 flex items-center space-x-3 cursor-pointer hover:bg-gray-50 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-gray-800">Dashboard</h4>
+                  </div>
+                </div>
+
+                <div 
+                  onClick={() => setCurrentScreen('attendance')}
+                  className="bg-white p-3.5 rounded-2xl shadow-xs border border-gray-100 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors relative"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                      <CalendarIcon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-gray-800">Calendar</h4>
+                    </div>
+                  </div>
+                  <span className="w-5 h-5 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center">3</span>
+                </div>
+
+                <div 
+                  onClick={() => setCurrentScreen('attendance')}
+                  className="bg-white p-3.5 rounded-2xl shadow-xs border border-gray-100 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors relative"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                      <CheckSquare className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-gray-800">Attendance</h4>
+                    </div>
+                  </div>
+                  <span className="w-5 h-5 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center">2</span>
+                </div>
+
+                <div className="bg-white p-3.5 rounded-2xl shadow-xs border border-gray-100 flex items-center space-x-3 cursor-pointer hover:bg-gray-50 transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-gray-800">Homework</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Today at a Glance */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-bold text-gray-800">Today at a Glance</h3>
+                <span className="text-[11px] text-blue-600 font-semibold cursor-pointer hover:underline">See all</span>
+              </div>
+              <div className="space-y-2">
+                <div className="bg-white p-3 rounded-2xl shadow-xs border border-gray-100 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-1 h-7 bg-red-500 rounded-full"></div>
+                    <span className="text-xs font-semibold text-gray-700">Classes Today - 6</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </div>
+                <div className="bg-white p-3 rounded-2xl shadow-xs border border-gray-100 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-1 h-7 bg-blue-500 rounded-full"></div>
+                    <span className="text-xs font-semibold text-gray-700">Pending Homework - 2</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </div>
+                <div className="bg-white p-3 rounded-2xl shadow-xs border border-gray-100 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-1 h-7 bg-amber-500 rounded-full"></div>
+                    <span className="text-xs font-semibold text-gray-700">New Circulars - 1</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* School Moments */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-bold text-gray-800">School Moments</h3>
+                <span className="text-[11px] text-blue-600 font-semibold cursor-pointer hover:underline">See all</span>
+              </div>
+              <div className="flex space-x-3 overflow-x-auto pb-2">
+                <div className="bg-white p-2.5 rounded-2xl shadow-xs border border-gray-100 w-44 shrink-0">
+                  <div className="h-20 bg-blue-100 rounded-xl mb-2 flex items-center justify-center font-bold text-blue-600 text-xs">
+                    science fair
+                  </div>
+                  <h4 className="text-xs font-bold text-gray-800">Science Fair 2025</h4>
+                  <p className="text-[10px] text-gray-500 mt-0.5">Date: March 10, 2025</p>
+                </div>
+                <div className="bg-white p-2.5 rounded-2xl shadow-xs border border-gray-100 w-44 shrink-0">
+                  <div className="h-20 bg-indigo-100 rounded-xl mb-2 flex items-center justify-center font-bold text-indigo-600 text-xs">
+                    sports day
+                  </div>
+                  <h4 className="text-xs font-bold text-gray-800">Sports Day 2025</h4>
+                  <p className="text-[10px] text-gray-500 mt-0.5">Date: March 10, 2025</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Home Indicator Bar */}
         <div className="h-6 bg-transparent flex items-center justify-center shrink-0 pb-1">
           <div className="w-32 h-1 bg-gray-800 rounded-full"></div>
         </div>
