@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, User, Building, Lock, Bell, Search, Calendar as CalendarIcon, CheckSquare, BookOpen, ChevronRight } from 'lucide-react';
+import { Eye, EyeOff, User, Building, Lock, Bell, Search, Calendar as CalendarIcon, CheckSquare, BookOpen, ChevronRight, ArrowLeft } from 'lucide-react';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'login' | 'dashboard' | 'attendance'>('login');
@@ -45,6 +45,30 @@ export default function App() {
       setLoading(false);
     }
   };
+
+  // Days configuration for October 2025 calendar mockup
+  // Oct 2025 starts on a Wednesday (index 3 if Sun=0)
+  const daysInMonth = 31;
+  const startDayOffset = 3; // Wednesday
+  const calendarDays = [];
+  
+  // Padding for previous month
+  for (let i = 0; i < startDayOffset; i++) {
+    calendarDays.push({ day: null, status: null });
+  }
+
+  // Days of October 2025
+  for (let d = 1; d <= daysInMonth; d++) {
+    let status = 'present';
+    if ([4, 11, 18, 25].includes(d)) {
+      status = 'weekend';
+    } else if ([7, 12, 16, 22, 29].includes(d)) {
+      status = 'absent';
+    } else if ([15, 20].includes(d)) {
+      status = 'leave';
+    }
+    calendarDays.push({ day: d, status });
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-200 via-purple-100 to-blue-300 flex items-center justify-center p-4 font-sans">
@@ -184,7 +208,6 @@ export default function App() {
         {/* Feature 2: Dashboard Screen */}
         {currentScreen === 'dashboard' && (
           <div className="flex-1 overflow-y-auto px-5 py-3 space-y-4">
-            {/* Top User Profile Header */}
             <div className="flex items-center justify-between mt-2">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center text-white font-bold justify-center shadow-md">
@@ -201,7 +224,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Search Bar */}
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                 <Search className="w-4 h-4" />
@@ -213,13 +235,11 @@ export default function App() {
               />
             </div>
 
-            {/* Announcement Banner */}
             <div className="bg-[#1f2937] text-white text-[11px] px-3.5 py-2.5 rounded-xl flex items-center space-x-2 shadow-sm">
               <span className="text-sm">📢</span>
               <span className="font-medium">Announcement: PTM on Mar 12, bus routes updated!</span>
             </div>
 
-            {/* School Menu Section */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-bold text-gray-800">School Menu</h3>
@@ -276,7 +296,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Today at a Glance */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-bold text-gray-800">Today at a Glance</h3>
@@ -307,7 +326,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* School Moments */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-bold text-gray-800">School Moments</h3>
@@ -327,6 +345,117 @@ export default function App() {
                   </div>
                   <h4 className="text-xs font-bold text-gray-800">Sports Day 2025</h4>
                   <p className="text-[10px] text-gray-500 mt-0.5">Date: March 10, 2025</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Feature 3: Attendance & Calendar Screen */}
+        {currentScreen === 'attendance' && (
+          <div className="flex-1 overflow-y-auto px-5 py-3 space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mt-1">
+              <button
+                onClick={() => setCurrentScreen('dashboard')}
+                className="w-9 h-9 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-700 hover:bg-gray-50"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <div className="text-center">
+                <h2 className="text-sm font-bold text-gray-900">Attendance</h2>
+                <p className="text-[10px] text-gray-500">Emma Roberts-Grade 7 B</p>
+              </div>
+              <div className="w-9 h-9 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-700 relative">
+                <Bell className="w-4 h-4" />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+              </div>
+            </div>
+
+            {/* Calendar Card */}
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-4 shadow-sm border border-white/60">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-bold text-gray-800">October 2025</h3>
+                <div className="flex space-x-1">
+                  <button className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-600 hover:bg-gray-200">&lt;</button>
+                  <button className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-600 hover:bg-gray-200">&gt;</button>
+                </div>
+              </div>
+
+              {/* Weekdays header */}
+              <div className="grid grid-cols-7 text-center text-[10px] font-semibold text-gray-400 mb-2">
+                <span>Sun</span>
+                <span>Mon</span>
+                <span>Tue</span>
+                <span>Wed</span>
+                <span>Thu</span>
+                <span>Fri</span>
+                <span>Sat</span>
+              </div>
+
+              {/* Days grid */}
+              <div className="grid grid-cols-7 gap-y-2 text-center text-xs">
+                {calendarDays.map((item, idx) => (
+                  <div key={idx} className="flex flex-col items-center justify-center h-8 relative">
+                    {item.day !== null ? (
+                      <>
+                        <span className={`font-semibold ${item.status === 'absent' ? 'text-red-500' : item.status === 'leave' ? 'text-amber-500' : 'text-blue-600'}`}>
+                          {item.day}
+                        </span>
+                        <div className="flex space-x-0.5 mt-0.5">
+                          {item.status === 'present' && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>}
+                          {item.status === 'absent' && <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>}
+                          {item.status === 'leave' && <span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>}
+                        </div>
+                      </>
+                    ) : (
+                      <span></span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Legend */}
+              <div className="flex items-center justify-center space-x-4 mt-4 pt-3 border-t border-gray-100 text-[10px] text-gray-600 font-medium">
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <span>Present</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                  <span>Absent</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-2 h-2 bg-amber-400 rounded-full"></span>
+                  <span>Leave</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Monthly Stats Card */}
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-4 shadow-sm border border-white/60 space-y-3">
+              <h3 className="text-xs font-bold text-gray-800">October 2025</h3>
+              <div>
+                <div className="flex justify-between text-xs font-semibold mb-1">
+                  <span className="text-gray-600">73% Attendance</span>
+                </div>
+                <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full w-[73%]"></div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                <div className="bg-gray-50 p-2.5 rounded-2xl border border-gray-100">
+                  <p className="text-[10px] text-gray-500 font-medium">Working Days</p>
+                  <p className="text-sm font-bold text-gray-800 mt-0.5">31</p>
+                </div>
+                <div className="bg-blue-50/60 p-2.5 rounded-2xl border border-blue-100">
+                  <p className="text-[10px] text-blue-600 font-medium">Present</p>
+                  <p className="text-sm font-bold text-blue-600 mt-0.5">23</p>
+                </div>
+                <div className="bg-red-50/60 p-2.5 rounded-2xl border border-red-100">
+                  <p className="text-[10px] text-red-500 font-medium">Absent</p>
+                  <p className="text-sm font-bold text-red-500 mt-0.5">5</p>
                 </div>
               </div>
             </div>

@@ -17,6 +17,11 @@ SchoolHub is a comprehensive School ERP web application consuming the ASP.NET Co
 - Today at a Glance summary section (Classes, Pending Homework, Circulars).
 - School Moments scrollable cards (Science Fair 2025, Sports Day 2025).
 
+### 3. Attendance & Calendar Screen
+- Attendance header with student info and back navigation.
+- October 2025 calendar grid with color-coded status indicator dots (Present, Absent, Leave) and legend.
+- Monthly statistics summary card featuring attendance percentage progress bar (73%), Working Days (31), Present count (23), and Absent count (5).
+
 ## Tech Stack
 - React + TypeScript
 - Vite
