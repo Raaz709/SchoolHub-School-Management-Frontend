@@ -2,6 +2,10 @@
 
 SchoolHub is a comprehensive School ERP web application consuming the ASP.NET Core API backend.
 
+## Design System & UI
+- **Shadcn UI & Tailwind CSS**: Built using Shadcn UI aesthetic principles with modern glassmorphism, soft pastel gradients (`#e0e7ff` to `#f3e8ff`), and refined card shadows.
+- **Reference Mockup Alignment**: Designed precisely around the mobile ERP reference mockup featuring smooth rounded containers, status bars, and polished components.
+
 ## Implemented Features
 
 ### 1. Login Screen
@@ -25,4 +29,5 @@ SchoolHub is a comprehensive School ERP web application consuming the ASP.NET Co
 ## Tech Stack
 - React + TypeScript
 - Vite
-- Tailwind CSS / Lucide Icons
+- Tailwind CSS v4 / Shadcn UI Styling / Lucide Icons
+- ASP.NET Core API Backend (C# / Entity Framework)
