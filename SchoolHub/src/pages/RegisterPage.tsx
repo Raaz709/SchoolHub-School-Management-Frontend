@@ -121,6 +121,17 @@ export function RegisterPage({ onBack }: { onBack: () => void }) {
             {busy ? "Creating..." : "Create account"}
           </button>
         </form>
+
+        <p className="mt-5 text-center text-[12.5px] text-ink-500">
+          Already have an account?{" "}
+          <button
+            type="button"
+            onClick={onBack}
+            className="font-semibold text-mint-600 hover:underline"
+          >
+            Sign in
+          </button>
+        </p>
       </div>
     </div>
   );

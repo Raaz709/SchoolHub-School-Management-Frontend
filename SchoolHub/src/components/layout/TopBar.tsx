@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Bell, ChevronDown, LogOut, Search } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-function initials(name: string): string {
-  return name.slice(0, 2).toUpperCase();
+function initials(name?: string): string {
+  return (name ?? "").slice(0, 2).toUpperCase() || "??";
 }
 
 export function TopBar() {
