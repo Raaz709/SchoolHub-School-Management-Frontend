@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import AppShell from "./AppShell";
+import { AuthProvider } from "./context/AuthContext";
 import { NavigationProvider } from "./context/NavigationContext";
 import "./index.css";
 
@@ -12,8 +13,10 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <NavigationProvider>
-      <AppShell />
-    </NavigationProvider>
+    <AuthProvider>
+      <NavigationProvider>
+        <AppShell />
+      </NavigationProvider>
+    </AuthProvider>
   </StrictMode>,
 );
