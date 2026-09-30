@@ -15,25 +15,40 @@ export type Child = {
   SectionName: string | null;
 };
 
+/** Reads a value that the API may send as either PascalCase or camelCase. */
+function pick(row: Record<string, unknown>, name: string): unknown {
+  return row[name] ?? row[name.charAt(0).toLowerCase() + name.slice(1)];
+}
+
 export async function fetchStudentDashboard(
   signal?: AbortSignal,
 ): Promise<StudentDashboard> {
-  const raw = await apiGet<any>("/api/portals/student/dashboard", signal);
+  const raw = await apiGet<Record<string, unknown>>(
+    "/api/portals/student/dashboard",
+    signal,
+  );
+
   return {
-    AttendancePercentage: Number(raw.AttendancePercentage ?? raw.attendancePercentage ?? 100),
-    PendingAssignments: Number(raw.PendingAssignments ?? raw.pendingAssignments ?? 0),
-    UpcomingExam: String(raw.UpcomingExam ?? raw.upcomingExam ?? "None scheduled"),
-    UnreadNotifications: Number(raw.UnreadNotifications ?? raw.unreadNotifications ?? 0),
+    AttendancePercentage: Number(pick(raw, "AttendancePercentage") ?? 100),
+    PendingAssignments: Number(pick(raw, "PendingAssignments") ?? 0),
+    UpcomingExam: String(pick(raw, "UpcomingExam") ?? "None scheduled"),
+    UnreadNotifications: Number(pick(raw, "UnreadNotifications") ?? 0),
   };
 }
 
-export async function fetchParentChildren(signal?: AbortSignal): Promise<Child[]> {
-  const raw = await apiGet<any[]>("/api/portals/parent/children", signal);
-  return (raw ?? []).map((c) => ({
-    StudentId: Number(c.StudentId ?? c.studentId ?? 0),
-    RollNumber: String(c.RollNumber ?? c.rollNumber ?? ""),
-    StudentName: String(c.StudentName ?? c.studentName ?? ""),
-    ClassName: c.ClassName ?? c.className ?? null,
-    SectionName: c.SectionName ?? c.sectionName ?? null,
+export async function fetchParentChildren(
+  signal?: AbortSignal,
+): Promise<Child[]> {
+  const rows = await apiGet<Record<string, unknown>[]>(
+    "/api/portals/parent/children",
+    signal,
+  );
+
+  return (rows ?? []).map((row) => ({
+    StudentId: Number(pick(row, "StudentId") ?? 0),
+    RollNumber: String(pick(row, "RollNumber") ?? ""),
+    StudentName: String(pick(row, "StudentName") ?? ""),
+    ClassName: (pick(row, "ClassName") as string | null) ?? null,
+    SectionName: (pick(row, "SectionName") as string | null) ?? null,
   }));
 }
