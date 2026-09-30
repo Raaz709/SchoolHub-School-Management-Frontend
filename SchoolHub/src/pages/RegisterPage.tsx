@@ -4,7 +4,8 @@ import { register } from "../api/auth";
 import { ApiError } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 
-type Role = "Student" | "Teacher" | "Parent";
+// Teacher and Admin accounts are provisioned by an administrator, not self-registered.
+type Role = "Student" | "Parent";
 
 export function RegisterPage({ onBack }: { onBack: () => void }) {
   const { signIn } = useAuth();
@@ -14,7 +15,6 @@ export function RegisterPage({ onBack }: { onBack: () => void }) {
     Email: "",
     Password: "",
     RollNumber: "",
-    EmployeeCode: "",
     Occupation: "",
   });
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +35,6 @@ export function RegisterPage({ onBack }: { onBack: () => void }) {
         Password: form.Password,
         Role: role,
         ...(role === "Student" ? { RollNumber: form.RollNumber } : {}),
-        ...(role === "Teacher" ? { EmployeeCode: form.EmployeeCode } : {}),
         ...(role === "Parent" ? { Occupation: form.Occupation } : {}),
       });
       signIn(res);
@@ -75,7 +74,7 @@ export function RegisterPage({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className="mb-5 grid grid-cols-3 gap-2 rounded-xl bg-line-soft p-1">
-          {(["Student", "Teacher", "Parent"] as Role[]).map((r) => (
+          {(["Student", "Parent"] as Role[]).map((r) => (
             <button
               key={r}
               type="button"
@@ -100,10 +99,7 @@ export function RegisterPage({ onBack }: { onBack: () => void }) {
           {role === "Student" && (
             <Field label="Roll Number" value={form.RollNumber} onChange={(v) => set("RollNumber", v)} />
           )}
-          {role === "Teacher" && (
-            <Field label="Employee Code" value={form.EmployeeCode} onChange={(v) => set("EmployeeCode", v)} />
-          )}
-          {role === "Parent" && (
+                    {role === "Parent" && (
             <Field label="Occupation" value={form.Occupation} onChange={(v) => set("Occupation", v)} />
           )}
 

@@ -10,18 +10,18 @@ export type RegisterRequest = {
   Username: string;
   Email: string;
   Password: string;
-  Role: "Student" | "Teacher" | "Parent";
+  /** Only Student and Parent can self-register; staff are created by an admin. */
+  Role: "Student" | "Parent";
   RollNumber?: string;
-  EmployeeCode?: string;
   Occupation?: string;
 };
 
 export type AuthResponse = {
-  accessToken: string;
-  refreshToken: string;
-  username: string;
-  role: string;
-  userId: number;
+  AccessToken: string;
+  RefreshToken: string;
+  Username: string;
+  Role: string;
+  UserId: number;
 };
 
 export function login(payload: LoginRequest): Promise<AuthResponse> {

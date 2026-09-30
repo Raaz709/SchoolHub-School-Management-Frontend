@@ -6,6 +6,7 @@ import { ComingSoon } from "./pages/ComingSoon";
 import { LoginPage } from "./pages/LoginPage";
 import { SchoolOverview } from "./pages/SchoolOverview";
 import { StudentInfo } from "./pages/StudentInfo";
+import { TeachersPage } from "./pages/TeachersPage";
 import { StudentDashboard } from "./pages/StudentDashboard";
 import { TeacherDashboard } from "./pages/TeacherDashboard";
 import { ParentDashboard } from "./pages/ParentDashboard";
@@ -40,6 +41,8 @@ export default function AppShell() {
       renderOverview()
     ) : activeId === "students" ? (
       <StudentInfo />
+    ) : activeId === "teachers" ? (
+      <TeachersPage />
     ) : activeId === "profile" ? (
       <ProfilePage />
     ) : (

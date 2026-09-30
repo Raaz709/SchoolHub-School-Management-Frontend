@@ -18,11 +18,11 @@ export type StudentSearchParams = {
   sectionId?: number | null;
 };
 
-export function fetchStudents(signal?: AbortSignal): Promise<Student[]> {
+export async function fetchStudents(signal?: AbortSignal): Promise<Student[]> {
   return apiGet<Student[]>("/api/students", signal);
 }
 
-export function searchStudents(
+export async function searchStudents(
   params: StudentSearchParams,
   signal?: AbortSignal,
 ): Promise<Student[]> {
@@ -31,8 +31,5 @@ export function searchStudents(
   if (params.classId) q.set("classId", String(params.classId));
   if (params.sectionId) q.set("sectionId", String(params.sectionId));
   const qs = q.toString();
-  return apiGet<Student[]>(
-    `/api/students/search${qs ? `?${qs}` : ""}`,
-    signal,
-  );
+  return apiGet<Student[]>(`/api/students/search${qs ? `?${qs}` : ""}`, signal);
 }

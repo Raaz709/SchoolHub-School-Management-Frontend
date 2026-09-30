@@ -66,12 +66,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback((res: AuthResponse) => {
     const next: AuthUser = {
-      userId: Number(res.userId ?? 0),
-      username: String(res.username ?? ""),
-      role: String(res.role ?? "Student"),
+      userId: Number(res.UserId ?? 0),
+      username: String(res.Username ?? ""),
+      role: String(res.Role ?? "Student"),
     };
-    setToken(res.accessToken);
-    setRefreshToken(res.refreshToken || null);
+    setToken(res.AccessToken);
+    setRefreshToken(res.RefreshToken || null);
     try {
       localStorage.setItem(USER_KEY, JSON.stringify(next));
     } catch {
