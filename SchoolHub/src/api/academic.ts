@@ -5,9 +5,15 @@ export type ClassItem = {
   Name: string;
 };
 
+/**
+ * `ClassId` is returned by the API but was previously absent from this type,
+ * which forced the UI to match a section to its class by name. Two classes can
+ * share a name, and a rename silently broke the pairing.
+ */
 export type SectionItem = {
   Id: number;
   Name: string;
+  ClassId: number | null;
   ClassName: string;
 };
 
