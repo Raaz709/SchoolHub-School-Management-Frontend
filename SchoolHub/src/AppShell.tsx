@@ -1,6 +1,6 @@
-import { useNavigation } from "./context/NavigationContext";
-import { useAuth } from "./context/AuthContext";
-import { findNavItem } from "./data/navigation";
+import { useNavigation } from "./context/useNavigation";
+import { useAuth } from "./context/useAuth";
+import { canAccess, DEFAULT_NAV_ID, findNavItem } from "./data/navigation";
 import { AppLayout } from "./layouts/AppLayout";
 import { ComingSoon } from "./pages/ComingSoon";
 import { LoginPage } from "./pages/LoginPage";
@@ -29,24 +29,33 @@ export default function AppShell() {
 
   const role = user?.role ?? "";
 
+  // Hiding a nav item is not enough on its own: activeId persists across a
+  // role change, so anything this role may not open is redirected rather than
+  // rendered.
+  const allowed = canAccess(role, activeId) ? activeId : DEFAULT_NAV_ID;
+
   function renderOverview() {
-    if (role === "Student") return <StudentDashboard />;
+    // Admin is the only role that gets the school-wide overview, because it is
+    // the only one that may read /api/admin/dashboard/stats. Anything
+    // unrecognised falls through to the student dashboard rather than the admin
+    // one, so a malformed role can never surface an admin page.
+    if (role === "Admin") return <SchoolOverview />;
     if (role === "Teacher") return <TeacherDashboard />;
     if (role === "Parent") return <ParentDashboard />;
-    return <SchoolOverview />;
+    return <StudentDashboard />;
   }
 
   const page =
-    activeId === "overview" ? (
+    allowed === "overview" ? (
       renderOverview()
-    ) : activeId === "students" ? (
+    ) : allowed === "students" ? (
       <StudentInfo />
-    ) : activeId === "teachers" ? (
+    ) : allowed === "teachers" ? (
       <TeachersPage />
-    ) : activeId === "profile" ? (
+    ) : allowed === "profile" ? (
       <ProfilePage />
     ) : (
-      <ComingSoon title={findNavItem(activeId)?.label ?? "Page"} />
+      <ComingSoon title={findNavItem(allowed)?.label ?? "Page"} />
     );
 
   return <AppLayout>{page}</AppLayout>;

@@ -1,5 +1,5 @@
 import { AlertTriangle, RefreshCw, LogIn } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 
 type ErrorStateProps = {
   message: string;

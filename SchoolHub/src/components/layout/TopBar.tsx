@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Bell, ChevronDown, LogOut, Search } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
-import { useNavigation } from "../../context/NavigationContext";
+import { useAuth } from "../../context/useAuth";
+import { useNavigation } from "../../context/useNavigation";
 
 function initials(name?: string): string {
   return (name ?? "").slice(0, 2).toUpperCase() || "??";

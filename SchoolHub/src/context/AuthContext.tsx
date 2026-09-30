@@ -1,7 +1,5 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -19,6 +17,7 @@ import {
   setToken,
 } from "../lib/api";
 import type { AuthResponse } from "../api/auth";
+import { AuthContext, type AuthContextValue, type AuthUser } from "./useAuth";
 import { logout } from "../api/auth";
 
 const USER_KEY = "schoolhub.user";
@@ -26,18 +25,6 @@ const USER_KEY = "schoolhub.user";
 /** Renew this long before the access token actually expires. */
 const RENEW_MARGIN_MS = 2 * 60 * 1000;
 
-export type AuthUser = {
-  userId: number;
-  username: string;
-  role: string;
-};
-
-type AuthContextValue = {
-  user: AuthUser | null;
-  isAuthenticated: boolean;
-  signIn: (res: AuthResponse) => void;
-  signOut: () => void;
-};
 
 function readStoredUser(): AuthUser | null {
   try {
@@ -49,7 +36,6 @@ function readStoredUser(): AuthUser | null {
   }
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
 
 /** Reads the stored refresh token, hands it to the API, then clears it. */
 async function revokeSession(): Promise<void> {
@@ -148,8 +134,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
-  return ctx;
-}

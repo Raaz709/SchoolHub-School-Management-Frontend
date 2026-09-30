@@ -10,7 +10,7 @@ import {
 } from "../api/teachers";
 import { fetchDepartments, fetchSubjects, type Department, type Subject } from "../api/academic";
 import { useAsync } from "../hooks/useAsync";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { PageHeader } from "../components/layout/PageHeader";
 import { ErrorState } from "../components/common/ErrorState";
 import { Skeleton } from "../components/common/Skeleton";

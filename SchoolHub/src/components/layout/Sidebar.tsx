@@ -1,10 +1,14 @@
 import { GraduationCap, PanelLeft } from "lucide-react";
-import { NAV_ITEMS } from "../../data/navigation";
-import { useNavigation } from "../../context/NavigationContext";
+import { navItemsForRole } from "../../data/navigation";
+import { useNavigation } from "../../context/useNavigation";
+import { useAuth } from "../../context/useAuth";
 import { cn } from "../../lib/cn";
 
 export function Sidebar() {
   const { activeId, setActiveId, collapsed, toggleCollapsed } = useNavigation();
+  const { user } = useAuth();
+  // Only the pages this role is allowed to open.
+  const items = navItemsForRole(user?.role);
 
   return (
     <aside
@@ -60,7 +64,7 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-6">
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon;
           const active = item.id === activeId;
 

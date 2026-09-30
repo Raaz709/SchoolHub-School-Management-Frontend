@@ -5,7 +5,7 @@ import { useAsync } from "../hooks/useAsync";
 import { PageHeader } from "../components/layout/PageHeader";
 import { ErrorState } from "../components/common/ErrorState";
 import { Skeleton } from "../components/common/Skeleton";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { ApiError } from "../lib/api";
 
 export function ProfilePage() {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, GraduationCap } from "lucide-react";
 import { register } from "../api/auth";
 import { ApiError } from "../lib/api";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 // Teacher and Admin accounts are provisioned by an administrator, not self-registered.
 type Role = "Student" | "Parent";

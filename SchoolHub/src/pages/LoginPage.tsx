@@ -2,7 +2,7 @@ import { useState } from "react";
 import { GraduationCap, Lock, Mail } from "lucide-react";
 import { login } from "../api/auth";
 import { ApiError } from "../lib/api";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { RegisterPage } from "./RegisterPage";
 
 export function LoginPage() {

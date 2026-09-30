@@ -7,7 +7,7 @@ import { StatCard } from "../components/dashboard/StatCard";
 import { AnnouncementsPanel } from "../components/dashboard/AnnouncementsPanel";
 import { ErrorState } from "../components/common/ErrorState";
 import { Skeleton } from "../components/common/Skeleton";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 export function StudentDashboard() {
   const { user } = useAuth();
