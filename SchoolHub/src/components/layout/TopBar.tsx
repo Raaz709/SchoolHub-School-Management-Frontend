@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Bell, ChevronDown, LogOut, Search } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigation } from "../../context/NavigationContext";
 
 function initials(name?: string): string {
   return (name ?? "").slice(0, 2).toUpperCase() || "??";
@@ -8,6 +9,7 @@ function initials(name?: string): string {
 
 export function TopBar() {
   const { user, signOut } = useAuth();
+  const { setActiveId } = useNavigation();
   const [open, setOpen] = useState(false);
 
   return (
@@ -26,6 +28,7 @@ export function TopBar() {
       <div className="flex items-center gap-3">
         <button
           type="button"
+          onClick={() => setActiveId("communicate")}
           aria-label="Notifications"
           className="relative grid h-10 w-10 place-items-center rounded-xl border border-line bg-white text-ink-500 transition hover:bg-line-soft hover:text-ink-700"
         >
@@ -33,11 +36,11 @@ export function TopBar() {
           <span className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-mint-500" />
         </button>
 
-        <div className="relative">
+        <div className="relative flex items-center">
           <button
             type="button"
-            onClick={() => setOpen((v) => !v)}
-            className="flex items-center gap-2.5 rounded-xl border border-line bg-white py-1.5 pl-1.5 pr-3 transition hover:bg-line-soft"
+            onClick={() => setActiveId("profile")}
+            className="flex items-center gap-2.5 rounded-xl border border-line bg-white py-1.5 pl-1.5 pr-2.5 transition hover:bg-line-soft text-left"
           >
             <span className="grid h-7 w-7 place-items-center rounded-lg bg-mint-100 text-[11px] font-bold text-mint-600">
               {user ? initials(user.username) : "--"}
@@ -50,7 +53,14 @@ export function TopBar() {
                 {user?.role ?? "Not signed in"}
               </span>
             </span>
-            <ChevronDown className="h-3.5 w-3.5 text-ink-400" strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="User menu"
+            className="ml-1 grid h-8 w-8 place-items-center rounded-xl border border-line bg-white text-ink-400 transition hover:bg-line-soft hover:text-ink-700"
+          >
+            <ChevronDown className="h-3.5 w-3.5" strokeWidth={2} />
           </button>
 
           {open && (

@@ -9,6 +9,7 @@ import { StudentInfo } from "./pages/StudentInfo";
 import { StudentDashboard } from "./pages/StudentDashboard";
 import { TeacherDashboard } from "./pages/TeacherDashboard";
 import { ParentDashboard } from "./pages/ParentDashboard";
+import { ProfilePage } from "./pages/ProfilePage";
 
 /**
  * Root of the authenticated app. Shows the login screen when there is no
@@ -39,6 +40,8 @@ export default function AppShell() {
       renderOverview()
     ) : activeId === "students" ? (
       <StudentInfo />
+    ) : activeId === "profile" ? (
+      <ProfilePage />
     ) : (
       <ComingSoon title={findNavItem(activeId)?.label ?? "Page"} />
     );

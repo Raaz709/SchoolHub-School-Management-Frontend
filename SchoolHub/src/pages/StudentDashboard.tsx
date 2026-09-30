@@ -1,8 +1,10 @@
-import { BookOpen, Calendar, GraduationCap, Bell, ClipboardCheck } from "lucide-react";
+import { BookOpen, Calendar, Bell, ClipboardCheck } from "lucide-react";
 import { fetchStudentDashboard } from "../api/portals";
+import { fetchAnnouncements } from "../api/announcements";
 import { useAsync } from "../hooks/useAsync";
 import { PageHeader } from "../components/layout/PageHeader";
 import { StatCard } from "../components/dashboard/StatCard";
+import { AnnouncementsPanel } from "../components/dashboard/AnnouncementsPanel";
 import { ErrorState } from "../components/common/ErrorState";
 import { Skeleton } from "../components/common/Skeleton";
 import { useAuth } from "../context/AuthContext";
@@ -10,6 +12,7 @@ import { useAuth } from "../context/AuthContext";
 export function StudentDashboard() {
   const { user } = useAuth();
   const stats = useAsync(fetchStudentDashboard);
+  const news = useAsync(fetchAnnouncements);
 
   if (stats.error) {
     return (
@@ -65,6 +68,10 @@ export function StudentDashboard() {
             />
           </>
         )}
+      </div>
+
+      <div className="mt-6">
+        <AnnouncementsPanel items={news.data ?? []} loading={news.loading} />
       </div>
     </>
   );

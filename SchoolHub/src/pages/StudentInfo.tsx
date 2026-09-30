@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { Search, UserRound } from "lucide-react";
 import { fetchStudents, searchStudents, type Student } from "../api/students";
-import { fetchClasses, fetchSections, type ClassItem, type SectionItem } from "../api/academic";
+import { fetchClasses, fetchSections } from "../api/academic";
 import { useAsync } from "../hooks/useAsync";
 import { PageHeader } from "../components/layout/PageHeader";
 import { ErrorState } from "../components/common/ErrorState";

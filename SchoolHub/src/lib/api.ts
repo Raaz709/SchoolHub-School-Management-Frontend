@@ -79,3 +79,35 @@ export async function apiPost<T>(
   const text = await res.text();
   return text ? (JSON.parse(text) as T) : (undefined as T);
 }
+
+export async function apiPut<T>(
+  path: string,
+  body: unknown,
+  signal?: AbortSignal,
+): Promise<T> {
+  const token = getToken();
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body),
+    signal,
+  });
+
+  if (!res.ok) {
+    let message = `PUT ${path} failed (${res.status})`;
+    try {
+      const text = await res.text();
+      if (text) message = text;
+    } catch {
+      /* keep default */
+    }
+    throw new ApiError(res.status, message);
+  }
+
+  const text = await res.text();
+  return text ? (JSON.parse(text) as T) : (undefined as T);
+}
