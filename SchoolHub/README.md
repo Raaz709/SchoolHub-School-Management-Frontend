@@ -186,6 +186,14 @@ Admin gets the full lifecycle; Teacher gets the same roster read-only.
 - `StudentDashboard`, `TeacherDashboard`, `ParentDashboard` — each renders from its own portal endpoints rather than the admin stats endpoint.
 - `ProfilePage` — own record only; reachable from the top-bar avatar for every role and deliberately absent from the sidebar.
 
+### Feature 7 — Academics ✅
+
+- Three tabs over `AcademicController`: classes, sections, subjects. Search filters the active tab as you type.
+- Admin gets create, rename, and delete on each list, plus a subject-assignment dialog per class that replaces the class's subject set in one call.
+- Class rows carry `SectionCount` so an unconfigured grade is visible without opening it. Section rows resolve their class by id, so the display label comes from `ClassName` and never from parsing a name. Subjects carry `TeacherName` so the owner column renders without a second request.
+- Deletes are guarded server-side: a class holding enrollments, a section holding enrollments, or a subject referenced by assignments/exams/timetable is refused with a count rather than a foreign-key error. The UI surfaces that message as an error notice.
+- **Roles:** Admin sees all write actions; Teacher gets the same three read-only lists with the action column empty.
+
 ---
 
 ## Roadmap
@@ -196,7 +204,7 @@ Admin gets the full lifecycle; Teacher gets the same roster read-only.
 - [x] **Feature 4** — Student management (CRUD)
 - [x] **Feature 5** — Teachers module (CRUD)
 - [x] **Feature 6** — Role dashboards + profile
-- [ ] **Feature 7** — Academics (`AcademicController`)
+- [x] **Feature 7** — Academics (classes, sections, subjects, class-subject mapping)
 - [ ] **Feature 8** — Attendance (`AttendanceController`)
 - [ ] **Feature 9** — Examinations (`ExamsController`)
 - [ ] **Feature 10** — Fees Collection (`FeesController`, `ReportsController`)

@@ -72,7 +72,7 @@ export const NAV_ITEMS: NavItem[] = [
   { id: "overview",    label: "School Overview", icon: School,       roles: ALL },
   { id: "students",    label: "Student Info",    icon: UserRound,    roles: STAFF },
   { id: "teachers",    label: "Teachers",        icon: Users,        roles: ADMIN_ONLY },
-  { id: "academics",   label: "Academics",       icon: Library,      roles: ADMIN_ONLY },
+  { id: "academics",   label: "Academics",       icon: Library,      roles: STAFF },
   { id: "timetable",   label: "Timetable",       icon: CalendarDays, roles: ALL },
   { id: "attendance",  label: "Attendance",      icon: ClipboardCheck, roles: LEARNER },
   { id: "exams",       label: "Examinations",    icon: ScrollText,   roles: STAFF_AND_STUDENT },
