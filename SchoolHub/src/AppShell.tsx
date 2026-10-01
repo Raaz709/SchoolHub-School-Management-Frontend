@@ -8,6 +8,7 @@ import { SchoolOverview } from "./pages/SchoolOverview";
 import { StudentInfo } from "./pages/StudentInfo";
 import { TeachersPage } from "./pages/TeachersPage";
 import { AcademicsPage } from "./pages/AcademicsPage";
+import { AttendancePage } from "./pages/AttendancePage";
 import { StudentDashboard } from "./pages/StudentDashboard";
 import { TeacherDashboard } from "./pages/TeacherDashboard";
 import { ParentDashboard } from "./pages/ParentDashboard";
@@ -55,6 +56,8 @@ export default function AppShell() {
       <TeachersPage />
     ) : allowed === "academics" ? (
       <AcademicsPage />
+    ) : allowed === "attendance" ? (
+      <AttendancePage />
     ) : allowed === "profile" ? (
       <ProfilePage />
     ) : (

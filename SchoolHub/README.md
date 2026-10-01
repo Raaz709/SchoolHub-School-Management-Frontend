@@ -73,6 +73,7 @@ src/
 │   ├── students.ts              # roster read + create/update/deactivate/reactivate/assign
 │   ├── teachers.ts              # teacher read + create/update/deactivate
 │   ├── academic.ts              # fetchClasses(), fetchSections()
+│   ├── attendance.ts            # roster, session history, marking writes, own record
 │   ├── portals.ts               # per-role dashboard data
 │   ├── profile.ts               # fetchProfile(), updateProfile(), password change
 │   └── teacher.ts               # teacher-scoped endpoints
@@ -91,7 +92,6 @@ src/
 │   ├── common/
 │   │   ├── EmptyPanel.tsx
 │   │   ├── ErrorState.tsx       # 401/403/network-aware error card + retry
-│   │   ├── Modal.tsx            # shared dialog shell for forms
 │   │   └── Skeleton.tsx         # loading pulse
 │   ├── dashboard/
 │   │   ├── StatCard.tsx
@@ -111,6 +111,8 @@ src/
 │   ├── ProfilePage.tsx          # own profile only, reachable from the avatar
 │   ├── StudentInfo.tsx          # full student CRUD (Admin) / read-only (Teacher)
 │   ├── TeachersPage.tsx         # full teacher CRUD (Admin)
+│   ├── AcademicsPage.tsx        # classes / sections / subjects tabs
+│   ├── AttendancePage.tsx       # marking (staff) + own records (Student/Parent)
 │   └── ComingSoon.tsx           # placeholder for unbuilt modules
 └── lib/
     ├── api.ts                   # apiGet/apiPost/apiPut/apiPatch, ApiError, token helpers
@@ -194,6 +196,15 @@ Admin gets the full lifecycle; Teacher gets the same roster read-only.
 - Deletes are guarded server-side: a class holding enrollments, a section holding enrollments, or a subject referenced by assignments/exams/timetable is refused with a count rather than a foreign-key error. The UI surfaces that message as an error notice.
 - **Roles:** Admin sees all write actions; Teacher gets the same three read-only lists with the action column empty.
 
+### Feature 8 — Attendance ✅
+
+- **Mark a day** — pick a class, section and date; the roster loads with each student's stored status already filled in, so a re-mark starts from the recorded decision. Four statuses only (`Present`, `Absent`, `Late`, `Excused`), with all-present/all-absent shortcuts for the common case and an optional remark per student.
+- **One session per section per day** — the API refuses a second mark for the same day with `409` and the existing session id, so saving an already-marked day opens it for correction instead of creating a duplicate that would double-count the day in a student's percentage.
+- **History** — `GET /api/attendance/sessions` with an optional class filter, newest first, showing marked-vs-total per day. A day where `Marked < Total` is flagged incomplete, because a student with no mark was previously indistinguishable from an absence. Edit opens that session.
+- **Correcting a session** — updates each mark in place rather than re-inserting, so a student's original remark is never orphaned and a student cannot be duplicated into one day.
+- **Student and Parent views** — the same page shows a read-only record with an attendance summary. A student reads `/api/attendance/mine`, which resolves the id server-side; nothing previously exposed a student's own `Students.Id`, so the page would otherwise have had to guess it. A parent picks a child, and the API re-checks the link server-side on every request.
+- **Roles:** Admin and Teacher get the marking screens; Student and Parent get only their own records. Sections are filtered by `ClassId` rather than matched on name, since a class and a section can share a name.
+
 ---
 
 ## Roadmap
@@ -205,7 +216,7 @@ Admin gets the full lifecycle; Teacher gets the same roster read-only.
 - [x] **Feature 5** — Teachers module (CRUD)
 - [x] **Feature 6** — Role dashboards + profile
 - [x] **Feature 7** — Academics (classes, sections, subjects, class-subject mapping)
-- [ ] **Feature 8** — Attendance (`AttendanceController`)
+- [x] **Feature 8** — Attendance (marking, correction, history, learner records)
 - [ ] **Feature 9** — Examinations (`ExamsController`)
 - [ ] **Feature 10** — Fees Collection (`FeesController`, `ReportsController`)
 - [ ] **Feature 11** — Timetable, Events, Assignments, Communicate
