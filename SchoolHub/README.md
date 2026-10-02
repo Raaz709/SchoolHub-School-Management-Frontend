@@ -74,6 +74,7 @@ src/
 │   ├── teachers.ts              # teacher read + create/update/deactivate
 │   ├── academic.ts              # fetchClasses(), fetchSections()
 │   ├── attendance.ts            # roster, session history, marking writes, own record
+│   ├── exams.ts                 # exam CRUD, papers, bulk marking, transcripts
 │   ├── portals.ts               # per-role dashboard data
 │   ├── profile.ts               # fetchProfile(), updateProfile(), password change
 │   └── teacher.ts               # teacher-scoped endpoints
@@ -113,6 +114,7 @@ src/
 │   ├── TeachersPage.tsx         # full teacher CRUD (Admin)
 │   ├── AcademicsPage.tsx        # classes / sections / subjects tabs
 │   ├── AttendancePage.tsx       # marking (staff) + own records (Student/Parent)
+│   ├── ExamsPage.tsx            # exam setup + bulk marking (staff) + transcripts (Student/Parent)
 │   └── ComingSoon.tsx           # placeholder for unbuilt modules
 └── lib/
     ├── api.ts                   # apiGet/apiPost/apiPut/apiPatch, ApiError, token helpers
@@ -205,6 +207,17 @@ Admin gets the full lifecycle; Teacher gets the same roster read-only.
 - **Student and Parent views** — the same page shows a read-only record with an attendance summary. A student reads `/api/attendance/mine`, which resolves the id server-side; nothing previously exposed a student's own `Students.Id`, so the page would otherwise have had to guess it. A parent picks a child, and the API re-checks the link server-side on every request.
 - **Roles:** Admin and Teacher get the marking screens; Student and Parent get only their own records. Sections are filtered by `ClassId` rather than matched on name, since a class and a section can share a name.
 
+### Feature 9 — Examinations ✅
+
+- **Exam setup** — create and edit an exam's title, academic year, date window and pass percentage. The year picker submits an `AcademicYearId` rather than a name, because the seed data holds two years both called `2024-2025` and a name-keyed picker would silently submit the wrong one.
+- **Papers** — a paper is one subject for one class, so one exam can cover several grades. The exam row shows paper and class counts, and flags a zero-paper exam in amber: that is the state a new exam starts in and it is not distinguishable from a finished one at a glance. Removes are guarded server-side and the refusal message names what blocks the delete.
+- **Marking** — opening a paper loads the class roster with stored marks, grades and remarks already filled in, so a re-mark starts from the recorded values and does not drop a remark. Each row shows the stored grade and percentage beside the input being edited, so a correction is visibly a correction.
+- **One save for the whole roster** — `PUT /api/exams/subjects/{id}/marks` applies a paper in a single transaction, so a teacher cannot stop halfway and leave a paper that looks complete. Blank rows are skipped; a mark outside `0..MaxMarks` or belonging to another class is rejected by the API with the offending student ids named, and nothing is written.
+- **Grading** — the server grades on fixed bands (`A+` 90, `A` 80, `B` 70, `C` 60, `F`) and echoes each student's computed percentage, grade and pass/fail back, so the screen shows the server's verdict rather than recomputing it. `PassingMarks` is entered as a percentage and labelled as such, since that is how the API reads it.
+- **Transcripts** — a Student reads `/api/exams/mine`, which resolves the student id server-side; nothing previously exposed a student's own `Students.Id`, so the page would otherwise have had to guess it. Rows are rolled up per exam server-side, each carrying its own exam's pass threshold rather than one shared line. A Parent picks a child and the API re-checks the link server-side on every request, so swapping the selector cannot reach an unlinked student.
+- **Roles:** Admin and Teacher get setup, paper management and marking; Student and Parent get only transcripts. Admin alone sees Delete, matching the API. Parents are excluded from the exam list itself, so the page never requests a list it is refused.
+- State is derived, not seeded: the selected exam, the child in view and the marking draft are all computed from the loaded rows, so a deleted exam, an unlinked child or a reopened paper cannot leave stale state behind, and no effect fires after unmount.
+
 ---
 
 ## Roadmap
@@ -217,7 +230,7 @@ Admin gets the full lifecycle; Teacher gets the same roster read-only.
 - [x] **Feature 6** — Role dashboards + profile
 - [x] **Feature 7** — Academics (classes, sections, subjects, class-subject mapping)
 - [x] **Feature 8** — Attendance (marking, correction, history, learner records)
-- [ ] **Feature 9** — Examinations (`ExamsController`)
+- [x] **Feature 9** — Examinations (exam CRUD, per-class papers, bulk marking, transcripts)
 - [ ] **Feature 10** — Fees Collection (`FeesController`, `ReportsController`)
 - [ ] **Feature 11** — Timetable, Events, Assignments, Communicate
 - [ ] **Feature 12** — Audit Logs, Reports
