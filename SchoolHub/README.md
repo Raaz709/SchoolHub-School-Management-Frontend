@@ -2,7 +2,7 @@
 
 A React + TypeScript school ERP web client that consumes the **SchoolHub ASP.NET Core API** (multi-tenant, JWT-authenticated). This is the **web** client; a React Native mobile app is planned against the same API.
 
-> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection, Timetable, Events, Assignments and Communicate.
+> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection, Timetable, Events, Assignments, Communicate, Reports and Audit Logs.
 
 ---
 
@@ -80,6 +80,8 @@ src/
 │   ├── events.ts                # events, RSVP, participant list and moderation
 │   ├── assignments.ts           # assignments, submissions, grading
 │   ├── notifications.ts         # inbox, unread count, mark-read and delete
+│   ├── reports.ts               # enrolment headcount and fee-collection reports
+│   ├── auditLogs.ts             # audit trail, action labels and tones
 │   ├── portals.ts               # per-role dashboard data
 │   ├── profile.ts               # fetchProfile(), updateProfile(), password change
 │   └── teacher.ts               # teacher-scoped endpoints
@@ -125,6 +127,8 @@ src/
 │   ├── EventsPage.tsx           # event calendar, RSVP and participant moderation
 │   ├── AssignmentsPage.tsx      # assignments + grading (staff) / submit (Student)
 │   ├── CommunicatePage.tsx      # announcements feed + notification inbox
+│   ├── ReportsPage.tsx          # enrolment + fee-collection reports (Admin)
+│   ├── AuditLogsPage.tsx        # recorded staff activity (Admin)
 │   └── ComingSoon.tsx           # placeholder for unbuilt modules
 └── lib/
     ├── api.ts                   # apiGet/apiPost/apiPut/apiPatch, ApiError, token helpers
@@ -143,7 +147,7 @@ Tokens are declared in `src/index.css` under Tailwind v4's `@theme` block, so ut
 | `ink-900` → `ink-400` | primary / secondary / muted text |
 | `line`, `line-soft` | borders and hover surfaces |
 | `canvas` | app background (`#f4f7fa`) |
-| `mint-50` → `mint-600` | brand accent, active states |
+| `mint-50` → `mint-700` | brand accent, active states, and the text colour of status pills |
 
 The active sidebar item uses an inline `linear-gradient(90deg, #dcf6cd → #b7eaa5)` with a mint-tinted drop shadow, matching the reference design.
 
@@ -280,6 +284,16 @@ Backed by `AnnouncementsController` (`/api/announcements/*`) and the notificatio
 - **Notification inbox** — the caller's own notifications (`GET /api/schoolextensions/notifications`) carry an unread state; one click marks a row read (`PATCH .../{id}/read`) and "Mark all read" clears the lot (`PATCH .../read-all`). A row can be deleted (`DELETE .../{id}`).
 - **Shared unread badge** — the top-bar bell shows the live unread count from `GET /api/schoolextensions/notifications/unread-count` and updates the moment the inbox changes, because each notification write dispatches `NOTIFICATIONS_CHANGED_EVENT` and the badge listens for it.
 
+### Feature 12 — Reports & Audit Logs ✅
+
+Backed by `ReportsController` (`/api/reports/*`) and `AuditLogsController` (`/api/auditlogs`). Both are read-only and Admin-only server-side, so neither page carries role logic of its own.
+
+- **Summary tiles** — students reported and classes covered from the enrolment report, then collected and outstanding money from the collection report. The collected tile carries the billed total as its hint, so the two figures are read together.
+- **Students by class** — one row per class and section with its headcount (`GET /api/reports/students-by-class`), and a footer that totals the column. A class with no sections yet still appears, labelled "All sections".
+- **Fee collection** — billed, collected and outstanding grouped by the status the API derives (`GET /api/reports/fee-collection`). The four statuses and their precedence come from the server, so the page only colours the pill; a school with nothing assigned shows an empty panel rather than a row of zeros.
+- **Audit trail** — recorded activity as timestamp, actor, action and details (`GET /api/auditlogs`). An entry whose account has since been deleted still stands and says so, and an IP address is shown only when one was captured.
+- **Filtering** — the audit endpoint takes no parameters, so the search box (actor, action or details) and the action picker filter what is on screen. The action options are derived from the data, so a new action needs no code change, and the header reads "n of m" while a filter is active.
+
 ---
 
 ## Roadmap
@@ -298,7 +312,7 @@ Backed by `AnnouncementsController` (`/api/announcements/*`) and the notificatio
 - [x] **Feature 11b** — Events (calendar, RSVP, participant moderation)
 - [x] **Feature 11c** — Assignments (staff set/grade, learner submit, class-scoped reads)
 - [x] **Feature 11d** — Communicate (scoped announcements, notification inbox, shared unread badge)
-- [ ] **Feature 12** — Audit Logs, Reports
+- [x] **Feature 12** — Audit Logs, Reports (enrolment + collection reports, audit trail)
 - [ ] **Feature 13** — Real routing (react-router-dom) + TanStack Query
 
 ---

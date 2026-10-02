@@ -22,6 +22,9 @@
   --color-mint-400: #86d677;
   --color-mint-500: #5cc14c;
   --color-mint-600: #3fa336;
+  /* Used by the status/pill text across the modules; without it the utilities
+     silently generate nothing and the text falls back to the inherited colour. */
+  --color-mint-700: #358a2d;
 }
 
 *,
