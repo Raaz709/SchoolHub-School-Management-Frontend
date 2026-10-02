@@ -2,7 +2,7 @@
 
 A React + TypeScript school ERP web client that consumes the **SchoolHub ASP.NET Core API** (multi-tenant, JWT-authenticated). This is the **web** client; a React Native mobile app is planned against the same API.
 
-> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection and Timetable.
+> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection, Timetable and Events.
 
 ---
 
@@ -77,6 +77,7 @@ src/
 │   ├── exams.ts                 # exam CRUD, papers, bulk marking, transcripts
 │   ├── fees.ts                  # fee structures, assignments, payments, summary
 │   ├── timetable.ts             # bell schedule, weekly entries, own/child week
+│   ├── events.ts                # events, RSVP, participant list and moderation
 │   ├── portals.ts               # per-role dashboard data
 │   ├── profile.ts               # fetchProfile(), updateProfile(), password change
 │   └── teacher.ts               # teacher-scoped endpoints
@@ -119,6 +120,7 @@ src/
 │   ├── ExamsPage.tsx            # exam setup + bulk marking (staff) + transcripts (Student/Parent)
 │   ├── FeesPage.tsx             # fee structures, assignment, ledger and payments (Admin)
 │   ├── TimetablePage.tsx        # bell schedule + weekly lesson grid (Admin) / own week
+│   ├── EventsPage.tsx           # event calendar, RSVP and participant moderation
 │   └── ComingSoon.tsx           # placeholder for unbuilt modules
 └── lib/
     ├── api.ts                   # apiGet/apiPost/apiPut/apiPatch, ApiError, token helpers
@@ -235,7 +237,7 @@ Admin-only, backed by `FeesController` and the fee-collection report in `Reports
 - **Guarded deletes** — a structure with assignments, or an assignment with payments, is refused with the amount or count that blocks it, so collected money is never silently cascaded away.
 - **State** — the ledger filters and every panel's refetch are lifted into the page, so one write refreshes exactly what it changed.
 
-### Feature 11 — Timetable ✅
+### Feature 11a — Timetable ✅
 
 Backed by `SchoolExtensionsController` (`/api/schoolextensions/timeslots`, `/api/schoolextensions/timetable`). Every signed-in role may read a timetable; only an Admin may write.
 
@@ -244,6 +246,16 @@ Backed by `SchoolExtensionsController` (`/api/schoolextensions/timeslots`, `/api
 - **Guarded writes** — the API refuses (409) a section booked twice in one period and a teacher booked in two places at once, and rejects (400) a bad day, a section from another class, a subject the class does not offer or an unknown period. The UI surfaces the message in a notice rather than failing silently.
 - **Role-aware reads** — Students and Teachers get their own week through `GET /api/schoolextensions/timetable/mine`; a parent picks a linked child and reads `GET /api/schoolextensions/timetable/student/{id}`. The class is resolved server-side, so a learner cannot request another section's week. The same grid is reused, showing the teacher's class and the learner's teacher respectively.
 - **State** — the selected class/section and the open editor draft are derived from the loaded rows, so switching class cannot leave a section or draft pointing at the previous one.
+
+### Feature 11b — Events ✅
+
+Backed by `SchoolExtensionsController` (`/api/schoolextensions/events/*`). Every signed-in role may read the calendar and answer for themselves; only an Admin may change an event.
+
+- **Calendar** — every event is a card with its date and time, location and description (`GET /api/schoolextensions/events`). Each card carries the caller's own response (`MyStatus`) and the number of responses so far.
+- **Creating and editing** — Admin only. One form covers create and edit; date is required and a duplicate title on the same date is refused with 409, surfaced as a notice. Deleting an event removes it and its responses together (`POST/PUT/DELETE /api/schoolextensions/events`).
+- **RSVP** — a selector records the caller's own response (`PUT /api/schoolextensions/events/{id}/rsvp`), upserted so a change replaces the previous answer, using the four statuses the API accepts (`Invited`, `Attending`, `Not Attending`, `Maybe`). Choosing "No response" removes the caller's row.
+- **Participant moderation** — expanding a card lists who responded and how (`GET /api/schoolextensions/events/{id}/participants`). Staff may remove anyone's response; a learner may remove only their own, which the API enforces independently of the UI.
+- **State** — one write refreshes the list, so the response count and the caller's own status stay in step without a second round trip.
 
 ---
 
@@ -260,7 +272,8 @@ Backed by `SchoolExtensionsController` (`/api/schoolextensions/timeslots`, `/api
 - [x] **Feature 9** — Examinations (exam CRUD, per-class papers, bulk marking, transcripts)
 - [x] **Feature 10** — Fees Collection (structures, assignment, ledger, payments)
 - [x] **Feature 11a** — Timetable (bell schedule, weekly lesson grid, own/child week)
-- [ ] **Feature 11b** — Events, Assignments, Communicate
+- [x] **Feature 11b** — Events (calendar, RSVP, participant moderation)
+- [ ] **Feature 11c** — Assignments, Communicate
 - [ ] **Feature 12** — Audit Logs, Reports
 - [ ] **Feature 13** — Real routing (react-router-dom) + TanStack Query
 
