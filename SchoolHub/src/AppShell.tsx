@@ -11,6 +11,7 @@ import { AcademicsPage } from "./pages/AcademicsPage";
 import { AttendancePage } from "./pages/AttendancePage";
 import { ExamsPage } from "./pages/ExamsPage";
 import { FeesPage } from "./pages/FeesPage";
+import { TimetablePage } from "./pages/TimetablePage";
 import { StudentDashboard } from "./pages/StudentDashboard";
 import { TeacherDashboard } from "./pages/TeacherDashboard";
 import { ParentDashboard } from "./pages/ParentDashboard";
@@ -58,6 +59,8 @@ export default function AppShell() {
       <TeachersPage />
     ) : allowed === "academics" ? (
       <AcademicsPage />
+    ) : allowed === "timetable" ? (
+      <TimetablePage />
     ) : allowed === "attendance" ? (
       <AttendancePage />
     ) : allowed === "exams" ? (

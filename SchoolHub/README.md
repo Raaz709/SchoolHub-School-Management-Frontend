@@ -2,7 +2,7 @@
 
 A React + TypeScript school ERP web client that consumes the **SchoolHub ASP.NET Core API** (multi-tenant, JWT-authenticated). This is the **web** client; a React Native mobile app is planned against the same API.
 
-> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations and Fees Collection.
+> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection and Timetable.
 
 ---
 
@@ -76,6 +76,7 @@ src/
 │   ├── attendance.ts            # roster, session history, marking writes, own record
 │   ├── exams.ts                 # exam CRUD, papers, bulk marking, transcripts
 │   ├── fees.ts                  # fee structures, assignments, payments, summary
+│   ├── timetable.ts             # bell schedule, weekly entries, own/child week
 │   ├── portals.ts               # per-role dashboard data
 │   ├── profile.ts               # fetchProfile(), updateProfile(), password change
 │   └── teacher.ts               # teacher-scoped endpoints
@@ -117,6 +118,7 @@ src/
 │   ├── AttendancePage.tsx       # marking (staff) + own records (Student/Parent)
 │   ├── ExamsPage.tsx            # exam setup + bulk marking (staff) + transcripts (Student/Parent)
 │   ├── FeesPage.tsx             # fee structures, assignment, ledger and payments (Admin)
+│   ├── TimetablePage.tsx        # bell schedule + weekly lesson grid (Admin) / own week
 │   └── ComingSoon.tsx           # placeholder for unbuilt modules
 └── lib/
     ├── api.ts                   # apiGet/apiPost/apiPut/apiPatch, ApiError, token helpers
@@ -233,6 +235,16 @@ Admin-only, backed by `FeesController` and the fee-collection report in `Reports
 - **Guarded deletes** — a structure with assignments, or an assignment with payments, is refused with the amount or count that blocks it, so collected money is never silently cascaded away.
 - **State** — the ledger filters and every panel's refetch are lifted into the page, so one write refreshes exactly what it changed.
 
+### Feature 11 — Timetable ✅
+
+Backed by `SchoolExtensionsController` (`/api/schoolextensions/timeslots`, `/api/schoolextensions/timetable`). Every signed-in role may read a timetable; only an Admin may write.
+
+- **Bell schedule** — the Admin page lists, adds, edits and deletes periods (`GET/POST/PUT/DELETE /api/schoolextensions/timeslots`). A period must end after it starts and cannot overlap another; a period still scheduled into the timetable is refused with a count of the lessons that block it, because the cascade would otherwise wipe them.
+- **Weekly grid** — pick a class and section to see the week as periods (rows) by day (columns). Clicking a cell adds a lesson or opens the one already there; the editor sets subject, teacher, period and day, and saves in place or removes it (`POST/PUT/DELETE /api/schoolextensions/timetable`).
+- **Guarded writes** — the API refuses (409) a section booked twice in one period and a teacher booked in two places at once, and rejects (400) a bad day, a section from another class, a subject the class does not offer or an unknown period. The UI surfaces the message in a notice rather than failing silently.
+- **Role-aware reads** — Students and Teachers get their own week through `GET /api/schoolextensions/timetable/mine`; a parent picks a linked child and reads `GET /api/schoolextensions/timetable/student/{id}`. The class is resolved server-side, so a learner cannot request another section's week. The same grid is reused, showing the teacher's class and the learner's teacher respectively.
+- **State** — the selected class/section and the open editor draft are derived from the loaded rows, so switching class cannot leave a section or draft pointing at the previous one.
+
 ---
 
 ## Roadmap
@@ -247,7 +259,8 @@ Admin-only, backed by `FeesController` and the fee-collection report in `Reports
 - [x] **Feature 8** — Attendance (marking, correction, history, learner records)
 - [x] **Feature 9** — Examinations (exam CRUD, per-class papers, bulk marking, transcripts)
 - [x] **Feature 10** — Fees Collection (structures, assignment, ledger, payments)
-- [ ] **Feature 11** — Timetable, Events, Assignments, Communicate
+- [x] **Feature 11a** — Timetable (bell schedule, weekly lesson grid, own/child week)
+- [ ] **Feature 11b** — Events, Assignments, Communicate
 - [ ] **Feature 12** — Audit Logs, Reports
 - [ ] **Feature 13** — Real routing (react-router-dom) + TanStack Query
 
