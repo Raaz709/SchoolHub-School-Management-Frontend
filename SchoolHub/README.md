@@ -2,7 +2,7 @@
 
 A React + TypeScript school ERP web client that consumes the **SchoolHub ASP.NET Core API** (multi-tenant, JWT-authenticated). This is the **web** client; a React Native mobile app is planned against the same API.
 
-> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection, Timetable, Events, Assignments, Communicate, Reports and Audit Logs.
+> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection, Timetable, Events, Assignments, Communicate, Reports and Audit Logs. Real routing (`react-router-dom`) and server-state management (`@tanstack/react-query`) now power navigation and data fetching.
 
 ---
 
@@ -15,9 +15,11 @@ A React + TypeScript school ERP web client that consumes the **SchoolHub ASP.NET
 | Styling | Tailwind CSS v4 (CSS-first, `@theme` tokens) |
 | Icons | lucide-react |
 | Compiler | React Compiler via `@rolldown/plugin-babel` |
+| Routing | `react-router-dom` v6 |
+| Data fetching | `@tanstack/react-query` v5 |
 | Backend | ASP.NET Core 8 Web API + EF Core + JWT |
 
-No routing or data-fetching libraries — deliberate deferrals (see *Roadmap*). Routing is context-based; data fetching uses a small `useAsync` hook.
+Routing uses `react-router-dom` with `BrowserRouter`; server-state management is powered by TanStack Query via a `useAsync` compatibility wrapper.
 
 ---
 
@@ -313,7 +315,7 @@ Backed by `ReportsController` (`/api/reports/*`) and `AuditLogsController` (`/ap
 - [x] **Feature 11c** — Assignments (staff set/grade, learner submit, class-scoped reads)
 - [x] **Feature 11d** — Communicate (scoped announcements, notification inbox, shared unread badge)
 - [x] **Feature 12** — Audit Logs, Reports (enrolment + collection reports, audit trail)
-- [ ] **Feature 13** — Real routing (react-router-dom) + TanStack Query
+- [x] **Feature 13** — Real routing (react-router-dom) + TanStack Query
 
 ---
 
