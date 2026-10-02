@@ -2,7 +2,7 @@
 
 A React + TypeScript school ERP web client that consumes the **SchoolHub ASP.NET Core API** (multi-tenant, JWT-authenticated). This is the **web** client; a React Native mobile app is planned against the same API.
 
-> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection, Timetable and Events.
+> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection, Timetable, Events and Assignments.
 
 ---
 
@@ -78,6 +78,7 @@ src/
 │   ├── fees.ts                  # fee structures, assignments, payments, summary
 │   ├── timetable.ts             # bell schedule, weekly entries, own/child week
 │   ├── events.ts                # events, RSVP, participant list and moderation
+│   ├── assignments.ts           # assignments, submissions, grading
 │   ├── portals.ts               # per-role dashboard data
 │   ├── profile.ts               # fetchProfile(), updateProfile(), password change
 │   └── teacher.ts               # teacher-scoped endpoints
@@ -121,6 +122,7 @@ src/
 │   ├── FeesPage.tsx             # fee structures, assignment, ledger and payments (Admin)
 │   ├── TimetablePage.tsx        # bell schedule + weekly lesson grid (Admin) / own week
 │   ├── EventsPage.tsx           # event calendar, RSVP and participant moderation
+│   ├── AssignmentsPage.tsx      # assignments + grading (staff) / submit (Student)
 │   └── ComingSoon.tsx           # placeholder for unbuilt modules
 └── lib/
     ├── api.ts                   # apiGet/apiPost/apiPut/apiPatch, ApiError, token helpers
@@ -257,6 +259,16 @@ Backed by `SchoolExtensionsController` (`/api/schoolextensions/events/*`). Every
 - **Participant moderation** — expanding a card lists who responded and how (`GET /api/schoolextensions/events/{id}/participants`). Staff may remove anyone's response; a learner may remove only their own, which the API enforces independently of the UI.
 - **State** — one write refreshes the list, so the response count and the caller's own status stay in step without a second round trip.
 
+### Feature 11c — Assignments ✅
+
+Backed by `AssignmentsController` (`/api/assignments/*`). Staff set and grade work; a learner sees only the assignments their class offers, which the API scopes before any data leaves the server.
+
+- **Staff list** — every assignment as a row with its subject, teacher, deadline, max score and submission count (`GET /api/assignments`). An overdue deadline is marked; create and edit share one form (`POST/PUT /api/assignments`), and a blank title, missing deadline, non-positive max score or unknown subject is refused with a notice.
+- **Ownership** — a Teacher may only edit or delete their own assignment, an Admin any. The UI offers the controls to all staff and surfaces the API's `403` in a notice rather than guessing who owns what.
+- **Submissions and grading** — expanding a row lists who submitted, when, and their file link (`GET /api/assignments/{id}/submissions`). Each row returns a score and feedback (`PUT /api/assignments/submissions/{id}`); a score outside `0..MaxScore` is refused. Clearing the score sends `null`, so a grade can be removed.
+- **Learner view** — a Student sees only the assignments their class offers, with their own submission state, score and feedback carried on the same row. They submit a link (`POST /api/assignments/submit`), upserted so a second call updates rather than duplicates, and the button reads "Submit" or "Update submission" accordingly.
+- **State** — one write refetches the list, so the submission count and the learner's status stay in step.
+
 ---
 
 ## Roadmap
@@ -273,7 +285,8 @@ Backed by `SchoolExtensionsController` (`/api/schoolextensions/events/*`). Every
 - [x] **Feature 10** — Fees Collection (structures, assignment, ledger, payments)
 - [x] **Feature 11a** — Timetable (bell schedule, weekly lesson grid, own/child week)
 - [x] **Feature 11b** — Events (calendar, RSVP, participant moderation)
-- [ ] **Feature 11c** — Assignments, Communicate
+- [x] **Feature 11c** — Assignments (staff set/grade, learner submit, class-scoped reads)
+- [ ] **Feature 11d** — Communicate
 - [ ] **Feature 12** — Audit Logs, Reports
 - [ ] **Feature 13** — Real routing (react-router-dom) + TanStack Query
 
