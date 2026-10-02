@@ -2,7 +2,7 @@
 
 A React + TypeScript school ERP web client that consumes the **SchoolHub ASP.NET Core API** (multi-tenant, JWT-authenticated). This is the **web** client; a React Native mobile app is planned against the same API.
 
-> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and two full management modules — Students (CRUD) and Teachers (CRUD).
+> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations and Fees Collection.
 
 ---
 
@@ -75,6 +75,7 @@ src/
 │   ├── academic.ts              # fetchClasses(), fetchSections()
 │   ├── attendance.ts            # roster, session history, marking writes, own record
 │   ├── exams.ts                 # exam CRUD, papers, bulk marking, transcripts
+│   ├── fees.ts                  # fee structures, assignments, payments, summary
 │   ├── portals.ts               # per-role dashboard data
 │   ├── profile.ts               # fetchProfile(), updateProfile(), password change
 │   └── teacher.ts               # teacher-scoped endpoints
@@ -115,6 +116,7 @@ src/
 │   ├── AcademicsPage.tsx        # classes / sections / subjects tabs
 │   ├── AttendancePage.tsx       # marking (staff) + own records (Student/Parent)
 │   ├── ExamsPage.tsx            # exam setup + bulk marking (staff) + transcripts (Student/Parent)
+│   ├── FeesPage.tsx             # fee structures, assignment, ledger and payments (Admin)
 │   └── ComingSoon.tsx           # placeholder for unbuilt modules
 └── lib/
     ├── api.ts                   # apiGet/apiPost/apiPut/apiPatch, ApiError, token helpers
@@ -218,6 +220,19 @@ Admin gets the full lifecycle; Teacher gets the same roster read-only.
 - **Roles:** Admin and Teacher get setup, paper management and marking; Student and Parent get only transcripts. Admin alone sees Delete, matching the API. Parents are excluded from the exam list itself, so the page never requests a list it is refused.
 - State is derived, not seeded: the selected exam, the child in view and the marking draft are all computed from the loaded rows, so a deleted exam, an unlinked child or a reopened paper cannot leave stale state behind, and no effect fires after unmount.
 
+### Feature 10 — Fees Collection ✅
+
+Admin-only, backed by `FeesController` and the fee-collection report in `ReportsController`.
+
+- **Summary** — billed, collected, outstanding and overdue totals for the whole school, from `GET /api/fees/summary`. Overdue is the outstanding part of fees past their due date.
+- **Fee structures** — create, edit and delete a charge (`GET/POST/PUT/DELETE /api/fees/structures`). A structure is either school-wide or fixed to one class. The list carries the class name and a live `AssignedCount`, so an assigned fee is visibly blocked from deletion or an amount change before the attempt.
+- **Assignment** — assign a fee to a whole class or to one student, with a due date (`POST /api/fees/assignments`). Re-assigning an already-charged fee is a no-op, so a class assignment can be safely re-run; the response reports how many were assigned versus skipped. A class-scoped fee can only go to its own class.
+- **Student ledger** — one row per fee a student owes, filterable by class, status and a name/roll search (`GET /api/fees/assignments`). Paid, outstanding and status are derived by the server, never stored: `Paid` (paid ≥ amount), else `Overdue` (past due), else `Partial`, else `Unpaid`.
+- **Recording a payment** — settles the selected ledger row inline (`POST /api/fees/payments`). Overpayment is refused with the balance named rather than silently carried as credit, and a fully-paid fee cannot take another payment. A payment refreshes the summary, ledger, structure counts and payment list together.
+- **Payment history** — recent payments with student, fee, method, reference and date (`GET /api/fees/payments`).
+- **Guarded deletes** — a structure with assignments, or an assignment with payments, is refused with the amount or count that blocks it, so collected money is never silently cascaded away.
+- **State** — the ledger filters and every panel's refetch are lifted into the page, so one write refreshes exactly what it changed.
+
 ---
 
 ## Roadmap
@@ -231,7 +246,7 @@ Admin gets the full lifecycle; Teacher gets the same roster read-only.
 - [x] **Feature 7** — Academics (classes, sections, subjects, class-subject mapping)
 - [x] **Feature 8** — Attendance (marking, correction, history, learner records)
 - [x] **Feature 9** — Examinations (exam CRUD, per-class papers, bulk marking, transcripts)
-- [ ] **Feature 10** — Fees Collection (`FeesController`, `ReportsController`)
+- [x] **Feature 10** — Fees Collection (structures, assignment, ledger, payments)
 - [ ] **Feature 11** — Timetable, Events, Assignments, Communicate
 - [ ] **Feature 12** — Audit Logs, Reports
 - [ ] **Feature 13** — Real routing (react-router-dom) + TanStack Query
@@ -246,7 +261,7 @@ The API lives in a separate repository (ASP.NET Core 8, PostgreSQL via Dapper, J
 
 ### Idempotent writes
 
-Assignment and similar operations are safe to retry. `POST /api/students/{id}/assign-class` upserts on `StudentId` rather than inserting, so a double-submit cannot create a second enrolment row — which previously made the roster return each student once per assignment.
+Assignment and similar operations are safe to retry. `POST /api/students/{id}/assign-class` upserts on `StudentId` rather than inserting, so a double-submit cannot create a second enrolment row — which previously made the roster return each student once per assignment. `POST /api/fees/assignments` is idempotent on `(StudentId, FeeStructureId)`, so re-running a class assignment cannot charge a student the same fee twice.
 
 Match on ids, not names, when reading an entity back. Class names are not unique in this database (`Grade 10` exists as both id 1 and id 4), so the student list returns `ClassId` and `SectionId` alongside the names; resolving by name would silently pick the wrong row.
 
