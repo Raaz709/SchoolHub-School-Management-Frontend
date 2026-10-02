@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Bell, ChevronDown, LogOut, Search } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
 import { useNavigation } from "../../context/useNavigation";
+import { useAsync } from "../../hooks/useAsync";
+import { NOTIFICATIONS_CHANGED_EVENT, fetchUnreadCount } from "../../api/notifications";
 
 function initials(name?: string): string {
   return (name ?? "").slice(0, 2).toUpperCase() || "??";
@@ -11,6 +13,20 @@ export function TopBar() {
   const { user, signOut } = useAuth();
   const { setActiveId } = useNavigation();
   const [open, setOpen] = useState(false);
+
+  // The badge mirrors the inbox on the Communicate page: it refreshes whenever
+  // that page marks something read, which the notifications API signals by
+  // dispatching NOTIFICATIONS_CHANGED_EVENT.
+  const { data: unread, refetch: refetchUnread } = useAsync(
+    useCallback((signal: AbortSignal) => fetchUnreadCount(signal), []),
+  );
+  const unreadCount = unread?.UnreadCount ?? 0;
+
+  useEffect(() => {
+    const refresh = () => refetchUnread();
+    window.addEventListener(NOTIFICATIONS_CHANGED_EVENT, refresh);
+    return () => window.removeEventListener(NOTIFICATIONS_CHANGED_EVENT, refresh);
+  }, [refetchUnread]);
 
   return (
     <header className="flex h-[68px] shrink-0 items-center justify-between gap-4 border-b border-line bg-white px-6 lg:px-8">
@@ -33,7 +49,11 @@ export function TopBar() {
           className="relative grid h-10 w-10 place-items-center rounded-xl border border-line bg-white text-ink-500 transition hover:bg-line-soft hover:text-ink-700"
         >
           <Bell className="h-[18px] w-[18px]" strokeWidth={1.9} />
-          <span className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-mint-500" />
+          {unreadCount > 0 && (
+            <span className="absolute -right-1 -top-1 grid h-4 min-w-[16px] place-items-center rounded-full bg-mint-500 px-1 text-[10px] font-bold leading-none text-white">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
         </button>
 
         <div className="relative flex items-center">

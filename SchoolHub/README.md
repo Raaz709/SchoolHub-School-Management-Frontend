@@ -2,7 +2,7 @@
 
 A React + TypeScript school ERP web client that consumes the **SchoolHub ASP.NET Core API** (multi-tenant, JWT-authenticated). This is the **web** client; a React Native mobile app is planned against the same API.
 
-> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection, Timetable, Events and Assignments.
+> **Status:** App shell, live dashboard, login/register, per-role dashboards, profile, and full management modules — Students, Teachers, Academics, Attendance, Examinations, Fees Collection, Timetable, Events, Assignments and Communicate.
 
 ---
 
@@ -69,7 +69,7 @@ src/
 ├── api/
 │   ├── auth.ts                  # login(), register()
 │   ├── dashboard.ts             # fetchDashboardStats()
-│   ├── announcements.ts         # fetchAnnouncements()
+│   ├── announcements.ts         # announcements feed + staff create/update/delete
 │   ├── students.ts              # roster read + create/update/deactivate/reactivate/assign
 │   ├── teachers.ts              # teacher read + create/update/deactivate
 │   ├── academic.ts              # fetchClasses(), fetchSections()
@@ -79,6 +79,7 @@ src/
 │   ├── timetable.ts             # bell schedule, weekly entries, own/child week
 │   ├── events.ts                # events, RSVP, participant list and moderation
 │   ├── assignments.ts           # assignments, submissions, grading
+│   ├── notifications.ts         # inbox, unread count, mark-read and delete
 │   ├── portals.ts               # per-role dashboard data
 │   ├── profile.ts               # fetchProfile(), updateProfile(), password change
 │   └── teacher.ts               # teacher-scoped endpoints
@@ -123,6 +124,7 @@ src/
 │   ├── TimetablePage.tsx        # bell schedule + weekly lesson grid (Admin) / own week
 │   ├── EventsPage.tsx           # event calendar, RSVP and participant moderation
 │   ├── AssignmentsPage.tsx      # assignments + grading (staff) / submit (Student)
+│   ├── CommunicatePage.tsx      # announcements feed + notification inbox
 │   └── ComingSoon.tsx           # placeholder for unbuilt modules
 └── lib/
     ├── api.ts                   # apiGet/apiPost/apiPut/apiPatch, ApiError, token helpers
@@ -269,6 +271,15 @@ Backed by `AssignmentsController` (`/api/assignments/*`). Staff set and grade wo
 - **Learner view** — a Student sees only the assignments their class offers, with their own submission state, score and feedback carried on the same row. They submit a link (`POST /api/assignments/submit`), upserted so a second call updates rather than duplicates, and the button reads "Submit" or "Update submission" accordingly.
 - **State** — one write refetches the list, so the submission count and the learner's status stay in step.
 
+### Feature 11d — Communicate ✅
+
+Backed by `AnnouncementsController` (`/api/announcements/*`) and the notifications endpoints (`/api/schoolextensions/notifications`). One page holds the school's announcements and the signed-in user's own notification inbox.
+
+- **Announcements feed** — every notice the API releases to the caller, newest first, each with its audience badge and, where set, the class it targets (`GET /api/announcements`). Reads are audience-scoped server-side: a Student sees their class and school-wide notices, a Parent their children's, staff everything.
+- **Publishing** — staff share one create/edit form (`POST/PUT /api/announcements`), choosing an audience (`All`/`Admin`/`Teacher`/`Student`/`Parent`) and optionally one class; a blank title or message, an unknown audience or an unknown class is refused with a notice. A Teacher may only change their own notice, an Admin any, and the API's `403` is shown rather than pre-emptively hiding the control.
+- **Notification inbox** — the caller's own notifications (`GET /api/schoolextensions/notifications`) carry an unread state; one click marks a row read (`PATCH .../{id}/read`) and "Mark all read" clears the lot (`PATCH .../read-all`). A row can be deleted (`DELETE .../{id}`).
+- **Shared unread badge** — the top-bar bell shows the live unread count from `GET /api/schoolextensions/notifications/unread-count` and updates the moment the inbox changes, because each notification write dispatches `NOTIFICATIONS_CHANGED_EVENT` and the badge listens for it.
+
 ---
 
 ## Roadmap
@@ -286,7 +297,7 @@ Backed by `AssignmentsController` (`/api/assignments/*`). Staff set and grade wo
 - [x] **Feature 11a** — Timetable (bell schedule, weekly lesson grid, own/child week)
 - [x] **Feature 11b** — Events (calendar, RSVP, participant moderation)
 - [x] **Feature 11c** — Assignments (staff set/grade, learner submit, class-scoped reads)
-- [ ] **Feature 11d** — Communicate
+- [x] **Feature 11d** — Communicate (scoped announcements, notification inbox, shared unread badge)
 - [ ] **Feature 12** — Audit Logs, Reports
 - [ ] **Feature 13** — Real routing (react-router-dom) + TanStack Query
 

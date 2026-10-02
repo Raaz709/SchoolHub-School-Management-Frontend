@@ -14,6 +14,7 @@ import { FeesPage } from "./pages/FeesPage";
 import { TimetablePage } from "./pages/TimetablePage";
 import { EventsPage } from "./pages/EventsPage";
 import { AssignmentsPage } from "./pages/AssignmentsPage";
+import { CommunicatePage } from "./pages/CommunicatePage";
 import { StudentDashboard } from "./pages/StudentDashboard";
 import { TeacherDashboard } from "./pages/TeacherDashboard";
 import { ParentDashboard } from "./pages/ParentDashboard";
@@ -73,6 +74,8 @@ export default function AppShell() {
       <EventsPage />
     ) : allowed === "assignments" ? (
       <AssignmentsPage />
+    ) : allowed === "communicate" ? (
+      <CommunicatePage />
     ) : allowed === "profile" ? (
       <ProfilePage />
     ) : (
