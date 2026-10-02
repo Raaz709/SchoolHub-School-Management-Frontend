@@ -1,12 +1,14 @@
 import { GraduationCap, PanelLeft } from "lucide-react";
+import { NavLink, useLocation } from "react-router-dom";
 import { navItemsForRole } from "../../data/navigation";
-import { useNavigation } from "../../context/useNavigation";
 import { useAuth } from "../../context/useAuth";
+import { useSidebar } from "../../context/useSidebar";
 import { cn } from "../../lib/cn";
 
 export function Sidebar() {
-  const { activeId, setActiveId, collapsed, toggleCollapsed } = useNavigation();
+  const { collapsed, toggleCollapsed } = useSidebar();
   const { user } = useAuth();
+  const location = useLocation();
   // Only the pages this role is allowed to open.
   const items = navItemsForRole(user?.role);
 
@@ -66,24 +68,25 @@ export function Sidebar() {
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-6">
         {items.map((item) => {
           const Icon = item.icon;
-          const active = item.id === activeId;
+          const active = location.pathname === item.path;
 
           return (
-            <button
+            <NavLink
               key={item.id}
-              type="button"
-              onClick={() => setActiveId(item.id)}
+              to={item.path}
               title={collapsed ? item.label : undefined}
               aria-current={active ? "page" : undefined}
-              className={cn(
-                "group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[14px] font-medium transition",
-                collapsed && "justify-center px-0",
-                active
-                  ? "text-ink-900 shadow-[0_6px_16px_-10px_rgba(86,180,70,0.9)]"
-                  : "text-ink-700 hover:bg-line-soft",
-              )}
-              style={
-                active
+              className={({ isActive }) =>
+                cn(
+                  "group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[14px] font-medium transition",
+                  collapsed && "justify-center px-0",
+                  isActive
+                    ? "text-ink-900 shadow-[0_6px_16px_-10px_rgba(86,180,70,0.9)]"
+                    : "text-ink-700 hover:bg-line-soft",
+                )
+              }
+              style={({ isActive }) =>
+                isActive
                   ? {
                       background:
                         "linear-gradient(90deg, #dcf6cd 0%, #b7eaa5 100%)",
@@ -101,7 +104,7 @@ export function Sidebar() {
                 strokeWidth={1.9}
               />
               {!collapsed && <span className="truncate">{item.label}</span>}
-            </button>
+            </NavLink>
           );
         })}
       </nav>

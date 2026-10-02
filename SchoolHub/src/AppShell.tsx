@@ -1,8 +1,7 @@
-import { useNavigation } from "./context/useNavigation";
 import { useAuth } from "./context/useAuth";
-import { canAccess, DEFAULT_NAV_ID, findNavItem } from "./data/navigation";
+import { canAccess } from "./data/navigation";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
-import { ComingSoon } from "./pages/ComingSoon";
 import { LoginPage } from "./pages/LoginPage";
 import { SchoolOverview } from "./pages/SchoolOverview";
 import { StudentInfo } from "./pages/StudentInfo";
@@ -26,12 +25,12 @@ import { ProfilePage } from "./pages/ProfilePage";
  * Root of the authenticated app. Shows the login screen when there is no
  * token, and the shell (sidebar + topbar + page) once signed in.
  *
- * The "overview" page is role-dependent: Admin/other → SchoolOverview,
- * Student → StudentDashboard, Teacher → TeacherDashboard, Parent → ParentDashboard.
+ * Routing is now handled by react-router-dom. The "overview" page is
+ * role-dependent: Admin → SchoolOverview, Teacher → TeacherDashboard,
+ * Parent → ParentDashboard, Student → StudentDashboard.
  */
 export default function AppShell() {
   const { isAuthenticated, user } = useAuth();
-  const { activeId } = useNavigation();
 
   if (!isAuthenticated) {
     return <LoginPage />;
@@ -39,54 +38,82 @@ export default function AppShell() {
 
   const role = user?.role ?? "";
 
-  // Hiding a nav item is not enough on its own: activeId persists across a
-  // role change, so anything this role may not open is redirected rather than
-  // rendered.
-  const allowed = canAccess(role, activeId) ? activeId : DEFAULT_NAV_ID;
+  return (
+    <AppLayout>
+      <Routes>
+        {/* Overview is role-dependent */}
+        <Route
+          path="/overview"
+          element={
+            role === "Admin" ? (
+              <SchoolOverview />
+            ) : role === "Teacher" ? (
+              <TeacherDashboard />
+            ) : role === "Parent" ? (
+              <ParentDashboard />
+            ) : (
+              <StudentDashboard />
+            )
+          }
+        />
 
-  function renderOverview() {
-    // Admin is the only role that gets the school-wide overview, because it is
-    // the only one that may read /api/admin/dashboard/stats. Anything
-    // unrecognised falls through to the student dashboard rather than the admin
-    // one, so a malformed role can never surface an admin page.
-    if (role === "Admin") return <SchoolOverview />;
-    if (role === "Teacher") return <TeacherDashboard />;
-    if (role === "Parent") return <ParentDashboard />;
-    return <StudentDashboard />;
-  }
+        {/* Static pages with role guards */}
+        <Route
+          path="/students"
+          element={canAccess(role, "students") ? <StudentInfo /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/teachers"
+          element={canAccess(role, "teachers") ? <TeachersPage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/academics"
+          element={canAccess(role, "academics") ? <AcademicsPage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/timetable"
+          element={canAccess(role, "timetable") ? <TimetablePage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/attendance"
+          element={canAccess(role, "attendance") ? <AttendancePage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/exams"
+          element={canAccess(role, "exams") ? <ExamsPage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/fees"
+          element={canAccess(role, "fees") ? <FeesPage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/events"
+          element={canAccess(role, "events") ? <EventsPage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/assignments"
+          element={canAccess(role, "assignments") ? <AssignmentsPage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/communicate"
+          element={canAccess(role, "communicate") ? <CommunicatePage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/reports"
+          element={canAccess(role, "reports") ? <ReportsPage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/audit-logs"
+          element={canAccess(role, "audit-logs") ? <AuditLogsPage /> : <Navigate to="/overview" replace />}
+        />
+        <Route
+          path="/profile"
+          element={canAccess(role, "profile") ? <ProfilePage /> : <Navigate to="/overview" replace />}
+        />
 
-  const page =
-    allowed === "overview" ? (
-      renderOverview()
-    ) : allowed === "students" ? (
-      <StudentInfo />
-    ) : allowed === "teachers" ? (
-      <TeachersPage />
-    ) : allowed === "academics" ? (
-      <AcademicsPage />
-    ) : allowed === "timetable" ? (
-      <TimetablePage />
-    ) : allowed === "attendance" ? (
-      <AttendancePage />
-    ) : allowed === "exams" ? (
-      <ExamsPage />
-    ) : allowed === "fees" ? (
-      <FeesPage />
-    ) : allowed === "events" ? (
-      <EventsPage />
-    ) : allowed === "assignments" ? (
-      <AssignmentsPage />
-    ) : allowed === "communicate" ? (
-      <CommunicatePage />
-    ) : allowed === "reports" ? (
-      <ReportsPage />
-    ) : allowed === "audit-logs" ? (
-      <AuditLogsPage />
-    ) : allowed === "profile" ? (
-      <ProfilePage />
-    ) : (
-      <ComingSoon title={findNavItem(allowed)?.label ?? "Page"} />
-    );
-
-  return <AppLayout>{page}</AppLayout>;
+        {/* Catch-all: redirect unknown paths to overview */}
+        <Route path="*" element={<Navigate to="/overview" replace />} />
+      </Routes>
+    </AppLayout>
+  );
 }

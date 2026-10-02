@@ -64,7 +64,7 @@ export function AuditLogsPage() {
         title="Audit Logs"
         subtitle="Recorded staff activity, newest first."
         action={
-          <button onClick={logs.refetch} className={ghostBtn} disabled={logs.loading}>
+          <button onClick={() => logs.refetch()} className={ghostBtn} disabled={logs.loading}>
             <RefreshCw className="h-4 w-4" strokeWidth={1.9} />
             {logs.loading ? "Refreshing..." : "Refresh"}
           </button>

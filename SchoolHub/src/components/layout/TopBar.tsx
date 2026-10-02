@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Bell, ChevronDown, LogOut, Search } from "lucide-react";
 import { useAuth } from "../../context/useAuth";
-import { useNavigation } from "../../context/useNavigation";
+import { useNavigate } from "react-router-dom";
 import { useAsync } from "../../hooks/useAsync";
 import { NOTIFICATIONS_CHANGED_EVENT, fetchUnreadCount } from "../../api/notifications";
 
@@ -11,7 +11,7 @@ function initials(name?: string): string {
 
 export function TopBar() {
   const { user, signOut } = useAuth();
-  const { setActiveId } = useNavigation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   // The badge mirrors the inbox on the Communicate page: it refreshes whenever
@@ -44,7 +44,7 @@ export function TopBar() {
       <div className="flex items-center gap-3">
         <button
           type="button"
-          onClick={() => setActiveId("communicate")}
+          onClick={() => navigate("/communicate")}
           aria-label="Notifications"
           className="relative grid h-10 w-10 place-items-center rounded-xl border border-line bg-white text-ink-500 transition hover:bg-line-soft hover:text-ink-700"
         >
@@ -59,7 +59,7 @@ export function TopBar() {
         <div className="relative flex items-center">
           <button
             type="button"
-            onClick={() => setActiveId("profile")}
+            onClick={() => navigate("/profile")}
             className="flex items-center gap-2.5 rounded-xl border border-line bg-white py-1.5 pl-1.5 pr-2.5 transition hover:bg-line-soft text-left"
           >
             <span className="grid h-7 w-7 place-items-center rounded-lg bg-mint-100 text-[11px] font-bold text-mint-600">

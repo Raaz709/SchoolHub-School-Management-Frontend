@@ -21,6 +21,7 @@ export type NavItem = {
   id: string;
   label: string;
   icon: LucideIcon;
+  path: string;
   /**
    * Roles allowed to see and open this page.
    *
@@ -69,24 +70,24 @@ const STAFF_AND_STUDENT: Role[] = ["Admin", "Teacher", "Student"];
 const LEARNER: Role[] = ["Admin", "Teacher", "Student", "Parent"];
 
 export const NAV_ITEMS: NavItem[] = [
-  { id: "overview",    label: "School Overview", icon: School,       roles: ALL },
-  { id: "students",    label: "Student Info",    icon: UserRound,    roles: STAFF },
-  { id: "teachers",    label: "Teachers",        icon: Users,        roles: ADMIN_ONLY },
-  { id: "academics",   label: "Academics",       icon: Library,      roles: STAFF },
-  { id: "timetable",   label: "Timetable",       icon: CalendarDays, roles: ALL },
-  { id: "attendance",  label: "Attendance",      icon: ClipboardCheck, roles: LEARNER },
-  { id: "exams",       label: "Examinations",    icon: ScrollText,   roles: STAFF_AND_STUDENT },
-  { id: "assignments", label: "Assignments",     icon: FileText,     roles: STAFF_AND_STUDENT },
-  { id: "fees",        label: "Fees Collection", icon: Wallet,       roles: ADMIN_ONLY },
-  { id: "communicate", label: "Communicate",     icon: MessageSquare, roles: ALL },
-  { id: "events",      label: "Events",          icon: PartyPopper,  roles: ALL },
-  { id: "reports",     label: "Reports",         icon: BarChart3,    roles: ADMIN_ONLY },
-  { id: "audit-logs",  label: "Audit Logs",      icon: History,      roles: ADMIN_ONLY },
+  { id: "overview",    label: "School Overview", icon: School,       roles: ALL, path: "/overview" },
+  { id: "students",    label: "Student Info",    icon: UserRound,    roles: STAFF, path: "/students" },
+  { id: "teachers",    label: "Teachers",        icon: Users,        roles: ADMIN_ONLY, path: "/teachers" },
+  { id: "academics",   label: "Academics",       icon: Library,      roles: STAFF, path: "/academics" },
+  { id: "timetable",   label: "Timetable",       icon: CalendarDays, roles: ALL, path: "/timetable" },
+  { id: "attendance",  label: "Attendance",      icon: ClipboardCheck, roles: LEARNER, path: "/attendance" },
+  { id: "exams",       label: "Examinations",    icon: ScrollText,   roles: STAFF_AND_STUDENT, path: "/exams" },
+  { id: "assignments", label: "Assignments",     icon: FileText,     roles: STAFF_AND_STUDENT, path: "/assignments" },
+  { id: "fees",        label: "Fees Collection", icon: Wallet,       roles: ADMIN_ONLY, path: "/fees" },
+  { id: "communicate", label: "Communicate",     icon: MessageSquare, roles: ALL, path: "/communicate" },
+  { id: "events",      label: "Events",          icon: PartyPopper,  roles: ALL, path: "/events" },
+  { id: "reports",     label: "Reports",         icon: BarChart3,    roles: ADMIN_ONLY, path: "/reports" },
+  { id: "audit-logs",  label: "Audit Logs",      icon: History,      roles: ADMIN_ONLY, path: "/audit-logs" },
 
   // Not in the sidebar: opened from the avatar button in the top bar. Every
   // signed-in role has a profile, and /api/profile only ever returns the
   // caller's own row.
-  { id: "profile",     label: "My Profile",      icon: UserRound,    roles: ALL, hidden: true },
+  { id: "profile",     label: "My Profile",      icon: UserRound,    roles: ALL, hidden: true, path: "/profile" },
 ];
 
 export const DEFAULT_NAV_ID = "overview";
